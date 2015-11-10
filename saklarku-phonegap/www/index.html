@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Saklarku</title>
+    <base target="_self">
+    <meta name="description" content="aplikasi remote control untuk mengendalikan saklar/relay yang terhubung pada GPIO di perangkat berbasis OpenWRT - made by @gojigeje">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="google" value="notranslate">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+    <link rel="shortcut icon" href="img/favicon.png">
+    <link href="css/materialize.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/saklar.css" rel="stylesheet"> </head>
+    
+<body>
+    <div class="navbar-fixed">
+        <nav class="indigo darken-1">
+            <div class="nav-wrapper"> <a href="#!" class="brand-logo">saklarku</a> <a href="#" id="toggle-menu-kiri" data-activates="menu-kiri" class="button-collapse show-on-large"><i class="fa fa-bars"></i></a>
+                <ul class="side-nav" id="menu-kiri">
+                    <li class="sidenav-account indigo darken-1"><b>saklarku</b>
+                        <br>by @gojigeje
+                        <br>v <span class="version"></span> - git.io/saklarku</li>
+                    <li class="sidenav-menu-separator"><a class="disabled" href="#"><i class="fa fa-server"></i>&nbsp; Server</a></li>
+                    <ul id="list-server"> </ul>
+                    <li><a href="#modal-tambah-server" class="modal-trigger"><i class="fa fa-plus"></i>&nbsp; Tambah Server</a></li>
+                    <li class="sidenav-menu-separator"><a href="#modal-tentang" class="modal-trigger">Tentang</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="col s12">
+                    <ul class="tabs indigo darken-1">
+                        <li class="tab col s3"><a href="#saklar">Saklar</a></li>
+                        <li class="tab col s3"><a href="#jadwal">Jadwal</a></li>
+                        <li class="tab col s3"><a href="#setting">Setting</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="loading" class="progress col s12">
+                <div class="indeterminate"></div>
+            </div>
+        </nav>
+    </div>
+    <div class="container">
+        <div id="loadingtext" class="center-align">memuat..</div>
+        <div id="noserver" class="row">
+            <div class="col s12">
+                <div class="card yellow">
+                    <div class="card-content black-text"> <span class="card-title black-text">Belum Ada Server</span>
+                        <p> Tambahkan server dengan cara membuka <i>side menu</i> dari kiri layar atau dengan tombol berikut ini. Pastikan script <b>saklarku-server</b> telah terpasang di server. </p>
+                    </div>
+                    <div class="card-action"> <a href="#modal-tambah-server" class="modal-trigger black-text yellow lighten-3 waves-effect btn-flat">Tambah Server</a> </div>
+                </div>
+            </div>
+        </div>
+        <div id="selectserver" class="row">
+            <div class="col s12">
+                <div class="card yellow">
+                    <div class="card-content black-text"> <span class="card-title black-text">Pilih Server</span>
+                        <p> Data server telah diperbarui. Silahkan pilih salah satu server di menu kiri. </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="errorDiv"></div>
+        <div class="row">
+            <div id="saklar" class="col s12">
+                <div id="saklar-content">
+                    <ul id="saklar-list" class="saklar-list collection with-header z-depth-1"> </ul>
+                    <ul class="saklar-list collection z-depth-1">
+                        <li class="collection-item">
+                            <div> SEMUA ON
+                                <a href="#!" class="secondary-content">
+                                    <button id="allon" class="indigo darken-1 waves-effect waves-light btn switch-button">ON</button>
+                                </a>
+                            </div>
+                        </li>
+                        <li class="collection-item">
+                            <div> SEMUA OFF
+                                <a href="#!" class="secondary-content">
+                                    <button id="alloff" class="indigo darken-1 waves-effect waves-light btn switch-button">OFF</button>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="saklar-list collection z-depth-1">
+                        <li class="collection-item">
+                            <div id="gpiolist"></div>
+                        </li>
+                        <li class="collection-item">
+                            <div> Kirim command:&nbsp;
+                                <button id="groupon" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd" value="1">ON</button>
+                                <button id="groupoff" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd" value="0">OFF</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="jadwal" class="col s12">
+                <div id="jadwal-content">
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="collection with-header z-depth-1">
+                                <li class="collection-header green">
+                                    <h4>HARIAN</h4></li>
+                                <li class="collection-item listjadwal">
+                                    <ul id="jadwalharian" class="collapsible" data-collapsible="accordion"> </ul>
+                                </li>
+                            </ul>
+                            <ul class="collection with-header z-depth-1">
+                                <li class="collection-header blue">
+                                    <h4>MINGGUAN</h4></li>
+                                <li class="collection-item listjadwal">
+                                    <ul id="jadwalmingguan" class="collapsible" data-collapsible="accordion"> </ul>
+                                </li>
+                            </ul>
+                            <ul class="collection with-header z-depth-1">
+                                <li class="collection-header purple lighten-2">
+                                    <h4>BULANAN</h4></li>
+                                <li class="collection-item listjadwal">
+                                    <ul id="jadwalbulanan" class="collapsible" data-collapsible="accordion"> </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="setting" class="col s12">
+                <div id="setting-content">
+                  <div class="row">
+                      <div class="col s12">
+                          <ul class="collection with-header z-depth-1">
+                              <li class="collection-header indigo darken-1">
+                                  <h4>SERVER</h4>
+                              </li>
+                              <li class="collection-item">
+                                  <div class="input-field indigo-text">
+                                    <input placeholder="serverku" id="setting_servername" type="text">
+                                    <input id="setting_servername_old" type="hidden">
+                                    <label for="first_name">Nama Server</label>
+                                  </div>
+                                  <div class="input-field indigo-text">
+                                    <input placeholder="http://serverku/gpio" id="setting_serverurl" type="text">
+                                    <label for="first_name">URL</label>
+                                  </div>
+                                  <div class="input-field indigo-text">
+                                    <input placeholder="password" id="setting_serverpass" type="password">
+                                    <label for="first_name">Password</label>
+                                  </div>
+                                  <div class="right">
+                                    <span id="saved">Disimpan.. </span>
+                                    <button id="btn_setting_save" class="indigo darken-1 waves-effect waves-light btn right-align">Simpan</button>
+                                  </div>
+                                <br><br>                              
+                              </li>
+                              <li class="collection-item">
+                                  <div> <span class="red-text">Hapus Server</span>
+                                      <a href="#!" class="secondary-content">
+                                          <button href="#modal-hapus-server" class="modal-trigger red darken-1 waves-effect waves-light btn right-align">Hapus</button>
+                                      </a>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            <div id="modal-tambah-server" class="modal">
+                <div class="modal-content">              
+                    <div class="center-align">
+                        <h4>Tambah Server</h4>
+                        <div class="divider"></div>
+                        <form class="col s12">
+                          <div class="row center-align">
+                            <div class="indigo-text">
+                              <label for="servername">Nama Server<span id="server-name-error"></span></label>
+                              <input id="servername" type="text" placeholder="serverku" >
+                            </div>
+                            <div class="indigo-text">
+                              <label for="serverurl">URL Server</label>
+                              <input id="serverurl" type="text" placeholder="http://serverku/gpio">
+                            </div>
+                            <div class="indigo-text ">
+                              <label for="serverpass">Password</label>
+                              <input id="serverpass" type="text" placeholder="password">
+                            </div>
+                            <div id="server-add-error"></div>
+                          </div>
+                        </form>
+                        <p>
+                            <a href="#" class="btn btn-flat grey lighten-2 modal-close">Batal</a> &nbsp;
+                            <a id="btn_addserver" href="#" class="waves-effect white-text indigo darken-1 btn btn-flat modal-action">Tambah</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-tentang" class="modal">
+                <div class="modal-content">
+                    <div class="center-align">
+                        <p> <b>saklarku </b> adalah aplikasi remote control untuk mengendalikan saklar/relay yang terhubung pada GPIO di perangkat berbasis OpenWRT. </p>
+                        <p> Aplikasi ini Open Source!. Dapatkan script saklarku-server dan source code aplikasi ini beserta panduan lengkapnya di <a href="http://git.io/saklarku">http://git.io/saklarku</a> </p>
+                        <div class="divider"></div>
+                        <p> versi <span class="version"></span> (<span id="buildver"></span>)
+                            <br> Copyright &copy; 2015 Ghozy Arif Fajri
+                            <br> <i class="fa fa-github-alt"></i>&nbsp; <a href="http://github.com/gojigeje">github.com/gojigeje</a>
+                            <br> <i class="fa fa-send"></i>&nbsp; <a href="http://telegram.me/gojigeje">telegram.me/gojigeje</a> </p>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-hapus-server" class="modal bottom-sheet modal-confirm">
+                <div class="modal-content">
+                    <h4><span id="confirm-header">Hapus Server</span></h4>
+                    <p><span class="confirm-content">Yakin hapus <span id="hapus_namaserver"></span> ?</span></p>
+                </div>
+                <div class="modal-footer"> <a href="#!" id="btn_hapusserver" class="modal-action waves-effect red btn" value="">Hapus</a> <a href="#!" class="modal-action modal-close waves-effect btn-flat">Batal</a> </div>
+            </div>
+            <div id="modal-connectionlost" class="modal bottom-sheet modal-confirm">
+                <div class="modal-content">
+                    <p><span class="confirm-content">Sambungan ke server terputus! Coba sambungkan lagi atau pilih server lain. Jika perlu, periksa kembali URL server dan passwordnya!</span></p>
+                </div>
+                <div class="modal-footer"> <a id="btn_reload" href="#!" class="modal-action waves-effect waves-indigo indigo darken-1 btn">Coba Lagi</a> </div>
+            </div>
+        </div>
+    </div>
+    <script src="cordova.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/materialize.min.js"></script>
+    <script src="js/saklar.js"></script>
+</body>
+
+</html>

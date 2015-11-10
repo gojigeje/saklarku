@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+  
+  <widget xmlns   = "http://www.w3.org/ns/widgets"
+          xmlns:gap   = "http://phonegap.com/ns/1.0"
+          id          = "id.gojigeje.saklarku"
+          versionCode = "1" 
+          version     = "0.1.0" >
+
+  <name>Saklarku</name>
+  <description>
+    Saklarku App untuk mengontrol GPIO di Router Huawei HG553
+  </description>
+  <author email="gojigeje@gmail.com" href="http://goji.web.id">
+    Ghozy Arif Fajri
+  </author>
+
+  <content src="index.html" />
+
+  <icon src="www/img/hdpi.png" />
+  <icon src="www/img/hdpi.png" gap:platform="android" gap:qualifier="ldpi" />
+  <icon src="www/img/mdpi.png" gap:platform="android" gap:qualifier="mdpi" />
+  <icon src="www/img/hdpi.png" gap:platform="android" gap:qualifier="hdpi" />
+  <icon src="www/img/xhdpi.png" gap:platform="android" gap:qualifier="xhdpi" />
+  <icon src="www/img/xxhdpi.png" gap:platform="android" gap:qualifier="xxhdpi" />
+  <icon src="www/img/xxxhdpi.png" gap:platform="android" gap:qualifier="xxxhdpi" />
+
+  <engine name="android" spec="~4.1.1" />
+
+  <!--
+      If you do not want any permissions to be added to your app, add the
+      following tag to your config.xml; you will still have the INTERNET
+      permission on your app, which PhoneGap requires.
+  -->
+  <preference name="permissions" value="none"/>
+  
+  <!--
+      Define access to external domains.
+
+      <access />            - a blank access tag denies access to all external resources.
+      <access origin="*" /> - a wildcard access tag allows access to all external resource.
+
+      Otherwise, you can specify specific domains:
+
+      <access origin="http://phonegap.com" />                    - allow any secure requests to http://phonegap.com/
+      <access origin="http://phonegap.com" subdomains="true" />  - same as above, but including subdomains, such as http://build.phonegap.com/
+      <access origin="http://phonegap.com" browserOnly="true" /> - only allows http://phonegap.com to be opened by the child browser.
+  -->
+  <access origin="*"/>
+
+  <!-- Added the following intents to support the removal of whitelist code from base cordova to a plugin -->
+  <!-- Whitelist configuration. Refer to https://cordova.apache.org/docs/en/edge/guide_appdev_whitelist_index.md.html -->
+  <gap:plugin name="cordova-plugin-whitelist" source="npm" />
+  <allow-intent href="http://*/*" />
+  <allow-intent href="https://*/*" />
+  <allow-intent href="tel:*" />
+  <allow-intent href="sms:*" />
+  <allow-intent href="mailto:*" />
+  <allow-intent href="geo:*" />
+  <platform name="android">
+      <allow-intent href="market:*" />
+  </platform>
+  
+</widget>

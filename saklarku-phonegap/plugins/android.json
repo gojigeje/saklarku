@@ -19,7 +19,7 @@
     },
     "installed_plugins": {
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "id.gojigeje.coba"
+            "PACKAGE_NAME": "id.gojigeje.saklarku"
         }
     },
     "dependent_plugins": {}

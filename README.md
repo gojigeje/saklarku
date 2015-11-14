@@ -8,7 +8,7 @@ Repository ini berisi source code aplikasi client yang dibangun dengan platform 
 
 1. [Tentang aplikasi client](#client-saklarku-phonegap)
 2. [Tentang script saklarku-server](#server-saklarku-server)
-3. [Develop & Build di komputer lokal](#develop-build-di-komputer-lokal)
+3. [Develop & Build di komputer lokal](#develop--build-di-komputer-lokal)
 4. [Memasang script saklarku-server di router](#memasang-script-saklarku-server-di-router)
 5. [Menghubungkan aplikasi client ke Server](#menghubungkan-aplikasi-client-ke-server)
 6. [Berkontribusi](#berkontribusi)

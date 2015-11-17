@@ -33,6 +33,7 @@ Repository ini berisi source code aplikasi client yang dibangun dengan platform 
 
 * [x] Mode kontrol saklar yang lengkap
 * [x] Posisi saklar tersinkronisasi ke semua aplikasi client
+* [x] Menyesuaikan nama masing-masing saklar
 * [x] Bisa menambahkan lebih dari 1 server
 * [x] Menampilkan jadwal dari crontab
 * [x] Ubah parameter server dan hapus server dengan mudah
@@ -40,7 +41,6 @@ Repository ini berisi source code aplikasi client yang dibangun dengan platform 
 
 **Todo:**
 
-* [ ] Edit nama tiap saklar
 * [ ] Menambah jadwal baru
 
 ## (Server) saklarku-server
@@ -125,7 +125,7 @@ Anda juga bisa menginstall BASH langsung dari ` opkg `.
 
 Saat ini client bisa mengenali jadwal harian, mingguan dan bulanan. Agar jadwal bisa ditampilkan, maka penulisan jadwal di crontab harus sesuai formatnya:  
 
-> **` * * * * * /full/script/path/to/gpio.sh [parameter] # Nama Jadwal`**  
+> **` * * * * * /full/path/to/gpio.sh [parameter] # Nama Jadwal`**  
 *- perhatikan bahwa path script ditulis dengan lengkap, dan nama jadwal dipisahkan oleh simbol #*
 
 * Matikan saklar 1 tiap hari jam 6:15 pagi dengan nama "Lampu Mati"  
@@ -138,6 +138,13 @@ Saat ini client bisa mengenali jadwal harian, mingguan dan bulanan. Agar jadwal 
    ` 30 9 25 * * /website/gpio/script/gpio.sh group 34 00 # Tanggal Tua `
 
 (_Anda bisa menggunakan layanan crontab generator agar lebih mudah dalam memahami sintaks crontab: http://crontab-generator.org_)
+
+##### **Agar Status/Posisi Saklar Dikembalikan Saat Startup**
+
+Setiap kali dijalankan, script gpio.sh akan menyimpan status terakhir semua GPIO ke file `gpio_status.cfg` di direktori yang sama. Anda bisa membaca file config ini ketika router startup dan mengembalikan posisi GPIO sesuai dengan posisi terakhir sebelum router mati.
+
+* Masukkan command berikut di ` /etc/rc/local ` :  
+   `/full/path/to/gpio.sh startup `
 
 ## Menghubungkan Aplikasi Client ke Server
 
@@ -168,6 +175,6 @@ Project ini masih terdapat sangat banyak bug, dan banyak kode yang tidak efisien
 
 * Joni Wang (https://www.facebook.com/joniwang)  
    untuk foto modifikasi hardware router Huawei HG553.
-* Link ke album foto untuk foto lengkap (*harus gabung ke group dulu*)  
+* Link ke album foto untuk foto lengkapnya (*harus gabung ke group dulu*)  
    https://www.facebook.com/media/set/?set=oa.950531958321162
 * Group OpenWRT Indonesia (https://www.facebook.com/groups/openwrt)

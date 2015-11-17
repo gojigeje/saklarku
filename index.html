@@ -70,14 +70,14 @@
                     <ul id="saklar-list" class="saklar-list collection with-header z-depth-1"> </ul>
                     <ul class="saklar-list collection z-depth-1">
                         <li class="collection-item">
-                            <div> SEMUA ON
+                            <div> Semua ON
                                 <a href="#!" class="secondary-content">
                                     <button id="allon" class="indigo darken-1 waves-effect waves-light btn switch-button">ON</button>
                                 </a>
                             </div>
                         </li>
                         <li class="collection-item">
-                            <div> SEMUA OFF
+                            <div> Semua OFF
                                 <a href="#!" class="secondary-content">
                                     <button id="alloff" class="indigo darken-1 waves-effect waves-light btn switch-button">OFF</button>
                                 </a>
@@ -90,8 +90,8 @@
                         </li>
                         <li class="collection-item">
                             <div> Kirim command:&nbsp;
-                                <button id="groupon" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd" value="1">ON</button>
-                                <button id="groupoff" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd" value="0">OFF</button>
+                                <button id="groupon" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd btnsml" value="1">ON</button>
+                                <button id="groupoff" class="indigo darken-1 waves-effect waves-light btn switch-button btn_groupcmd btnsml" value="0">OFF</button>
                             </div>
                         </li>
                     </ul>
@@ -130,6 +130,21 @@
                 <div id="setting-content">
                   <div class="row">
                       <div class="col s12">
+                          <ul id="setting-content-nama" class="collection with-header z-depth-1">
+                              <li class="collection-header indigo darken-1">
+                                  <h4>NAMA SAKLAR</h4>
+                              </li>
+                              <li class="collection-item">
+                                  <div id="names">
+                                  </div>
+                                  <div class="right">
+                                    <span id="saved_name">Disimpan.. </span>
+                                    <button id="btn_name_save" class="indigo darken-1 waves-effect waves-light btn btnsml right-align">Simpan</button>
+                                  </div>
+                                  <br>
+                              </li>
+                          </ul>
+
                           <ul class="collection with-header z-depth-1">
                               <li class="collection-header indigo darken-1">
                                   <h4>SERVER</h4>
@@ -138,21 +153,21 @@
                                   <div class="input-field indigo-text">
                                     <input placeholder="serverku" id="setting_servername" type="text">
                                     <input id="setting_servername_old" type="hidden">
-                                    <label for="first_name">Nama Server</label>
+                                    <label for="setting_servername">Nama Server</label>
                                   </div>
                                   <div class="input-field indigo-text">
                                     <input placeholder="http://serverku/gpio" id="setting_serverurl" type="text">
-                                    <label for="first_name">URL</label>
+                                    <label for="setting_serverurl">URL</label>
                                   </div>
                                   <div class="input-field indigo-text">
                                     <input placeholder="password" id="setting_serverpass" type="password">
-                                    <label for="first_name">Password</label>
+                                    <label for="setting_serverpass">Password</label>
                                   </div>
                                   <div class="right">
                                     <span id="saved">Disimpan.. </span>
-                                    <button id="btn_setting_save" class="indigo darken-1 waves-effect waves-light btn right-align">Simpan</button>
+                                    <button id="btn_setting_save" class="indigo darken-1 waves-effect waves-light btn right-align btnsml">Simpan</button>
                                   </div>
-                                <br><br>                              
+                                <br>
                               </li>
                               <li class="collection-item">
                                   <div> <span class="red-text">Hapus Server</span>
@@ -220,6 +235,13 @@
                     <p><span class="confirm-content">Sambungan ke server terputus! Coba sambungkan lagi atau pilih server lain. Jika perlu, periksa kembali URL server dan passwordnya!</span></p>
                 </div>
                 <div class="modal-footer"> <a id="btn_reload" href="#!" class="modal-action waves-effect waves-indigo indigo darken-1 btn">Coba Lagi</a> </div>
+            </div>
+            <div id="modal-message" class="modal bottom-sheet modal-confirm">
+                <div class="modal-content">
+                    <h4><span id="message-header"></span></h4>
+                    <p><span id="message-content" class="confirm-content"></span></p>
+                </div>
+                <div class="modal-footer"> <a href="#!" class="modal-action modal-close waves-effect waves-indigo indigo darken-1 btn">OK</a> </div>
             </div>
         </div>
     </div>

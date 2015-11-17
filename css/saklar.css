@@ -7,7 +7,7 @@
 #sidenav-overlay {
   background-color: rgba(0,0,0,0.6);
 }
-#saklar-content, #jadwal-content, #setting-content , #noserver, #selectserver, #saved/* , #loading  */ , .saklar-list {
+#saklar-content, #jadwal-content, #setting-content, #setting-content-nama , #noserver, #selectserver, #saved, #saved_name/* , #loading  */ , .saklar-list {
   display: none;
 }
 
@@ -47,7 +47,7 @@
   background-color: #3949AB;
 }
 
-.collection li:last-child button {
+.btnsml {
   margin: -3px 3px;
   height: 28px;
   line-height: 28px;
@@ -203,7 +203,7 @@ nav .button-collapse i {
 }
 .modal-confirm .modal-content {
   font-size: 1rem;
-  padding: 24px;
+  padding: 24px 24px 0;
 }
 
 #server-name-error, #server-add-error {

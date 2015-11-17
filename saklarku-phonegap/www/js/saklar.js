@@ -1,5 +1,5 @@
-versi = "0.1";
-build = "20151111";
+versi = "0.2.0";
+build = "20151117";
 timeout_value = 15000; // 15 detik
 
 function cekStatus() {
@@ -27,6 +27,14 @@ function cekStatus() {
               // console.log('gpio:'+ke+' -> true');
               $('.switch-control:eq('+ke+')').prop('checked', true);
             }
+
+            if (typeof v.name == 'undefined') {
+              var nama = 'Saklar '+v.gpio;
+            } else {
+              var nama = v.name;
+            }
+            $('#saklarname_'+v.gpio).html(nama);
+            // $('#name_'+v.gpio).val(nama);
           });
         }
       } else {
@@ -42,7 +50,7 @@ function cekStatus() {
       if (t==="timeout") {
         console.log("cekStatus: timeout");
         gagal('Timeout saat menghubungi server!');
-        $('#saklar-content, .saklar-list, #jadwal-content').fadeOut('fast');
+        $('#saklar-content, .saklar-list, #jadwal-content, #setting-content-nama').fadeOut('fast');
       } else {
         console.log("cekStatus: error");
         $('#modal-connectionlost').openModal();
@@ -80,10 +88,10 @@ function changeServer(a) {
   // console.log('changeServer:'+a);
 
   window.processing = true;
-
   if (typeof a == 'undefined') {
     // console.log('kosong!!!');
-    $('#saklar-content, .saklar-list, #jadwal-content, #setting-content').fadeOut('fast', function() {
+    $('#errorDiv').hide();
+    $('#saklar-content, .saklar-list, #jadwal-content, #setting-content, #setting-content-nama').fadeOut('fast', function() {
       listServer();
       $('#loading, #loadingtext').hide();
       if (window.serverName.length == 0) {
@@ -105,7 +113,7 @@ function changeServer(a) {
     window.currentServerURL = window.serverURL[index];
     window.currentServerPassword = window.serverKey[index];
 
-    $('#saklar-content, .saklar-list, #jadwal-content').fadeOut('fast', function() {
+    $('#saklar-content, .saklar-list, #jadwal-content, #setting-content-nama').fadeOut('fast', function() {
       $('#saklar-list').replaceWith('<ul id="saklar-list" class="saklar-list collection with-header z-depth-1"></ul>');
       $('#jadwalharian').replaceWith('<ul id="jadwalharian" class="collapsible" data-collapsible="accordion"><li class="center-align nojadwal">tidak ada jadwal</li></ul>');
       $('#jadwalmingguan').replaceWith('<ul id="jadwalmingguan" class="collapsible" data-collapsible="accordion"><li class="center-align nojadwal">tidak ada jadwal</li></ul>');
@@ -140,10 +148,16 @@ function getList() {
       var __list = '<ul id="saklar-list" class="saklar-list collection with-header z-depth-1">'
                 +'<li id="list_servername" class="collection-header indigo darken-1"><h4><i class="fa fa-sitemap"></i>&nbsp; '+window.currentServerName+'</h4></li>';
       var __listcheck = '<div id="gpiolist"><p>Pilih Saklar:</p><p>';
+      var __names = '';
       $.each(data.gpios, function(i, v) {
+        if (typeof v.name == 'undefined') {
+          var nama = 'Saklar '+v.gpio;
+        } else {
+          var nama = v.name;
+        }
         __list+='<li class="collection-item">'
           +'  <div>'
-          +'    SAKLAR '+v.gpio+''
+          +'    <span id="saklarname_'+v.gpio+'">'+nama+'</span>'
           +'    <a href="#!" class="secondary-content">'
           +'      <div class="switch">'
           +'        <label>'
@@ -156,6 +170,10 @@ function getList() {
           +'</li>';
         __listcheck+='<input type="checkbox" class="filled-in" id="pilih-'+v.gpio+'" name="gpiolist-cb" value="'+v.gpio+'"/>'
                   +'<label for="pilih-'+v.gpio+'">'+v.gpio+'</label>';
+        __names+='<div class="input-field">'
+        +'  <input placeholder="SAKLAR '+v.gpio+'" type="text" id="name_'+v.gpio+'" name="names[]" value="'+nama+'">'
+        +'  <label class="active" for="name_1">Saklar '+v.gpio+'</label>'
+        +'</div>';
       });
       __list+='</ul>';
       __listcheck+='</p></div>';
@@ -165,11 +183,9 @@ function getList() {
       $('#errorDiv, #selectserver').hide();
 
       $('#saklar-list').replaceWith(__list);
+      $('#names').html(__names);
       $('#gpiolist').replaceWith(__listcheck);
-      $('#saklar-content, .saklar-list, #jadwal-content, #setting-content').fadeIn('fast');
-
-      $('#hapus_namaserver').html(window.currentServerName);
-      $('#btn_hapusserver').attr('value', window.currentServerName);
+      $('#saklar-content, .saklar-list, #jadwal-content, #setting-content, #setting-content-nama').fadeIn('fast');
 
       // ambil list jadwal
       $('#loadingtext').html('Mengambil jadwal..');
@@ -187,6 +203,10 @@ function getList() {
       gagal();
     }
     console.log("error: listSaklar");
+  })
+  .always(function(){
+    $('#hapus_namaserver').html(window.currentServerName);
+    $('#btn_hapusserver').attr('value', window.currentServerName);
   });
 }
 
@@ -569,6 +589,7 @@ $(window).load(function() {
         url: serverurl+'/?auth',
         type: 'POST',
         data: {key: serverpass},
+        timeout: timeout_value,
       })
       .done(function(data) {
         if (data.success) {
@@ -602,6 +623,7 @@ $(window).load(function() {
           updateSetting();
           setTimer();
 
+          $('ul.tabs').tabs('select_tab', 'saklar');
         } else {
           // gagal
           console.log('gagal!');
@@ -655,7 +677,7 @@ $(window).load(function() {
             }
           });
 
-          Materialize.toast('command: group '+gtarget+' '+gstatus, 2000);
+          Materialize.toast('GPIO '+gtarget+' > '+gstatus, 2000);
         } else {
           window.processing = false;
           $('#loading').hide();
@@ -709,6 +731,54 @@ $(window).load(function() {
 
     listServer();
   });
+  
+  $('#btn_name_save').click(function(event) {
+    var name = '';
+    $("input[name='names[]']").each(function() {
+      name += $(this).val().replace(/;/g,"") + ';';
+    });
+    name = name.replace(/;$/, "").replace(/\"/g, "").replace(/\'/g, "");
+    // console.log(name);
+
+    if (!window.processing) {
+      $('#loading').show();
+      window.processing = true;
+
+      $.ajax({
+        url: window.currentServerURL+'/?updatenama',
+        type: 'POST',
+        data: {key: window.currentServerPassword, nama: name},
+        timeout: timeout_value,
+      })
+      .done(function(data) {
+        
+        if (data.success) {
+          $.each(data.gpios, function(i, v) {
+            // console.log('#saklarname_'+v.gpio+': '+v.name);
+            $('#saklarname_'+v.gpio).html(v.name);
+          });
+
+          $('#saved_name').fadeIn(400, function() {
+            $(this).delay(1000).fadeOut(400);
+          });
+        } else {
+          if (data.message == "request tidak lengkap atau salah") {
+            $('#message-header').html('Update Script Server!');
+            $('#message-content').html('Tidak bisa menyimpan nama saklar.<br>Update script server dengan versi terbaru di github!');
+            $('#modal-message').openModal();
+            console.log('oldversion!');
+          }
+        }
+
+      })
+      .always(function(){
+        $('#loading').hide();
+        window.processing = false;
+      });
+
+    } else { console.log('lagi proses'); }
+    
+  });
 
   $('#btn_hapusserver').click(function(event) {
     // get index
@@ -734,40 +804,11 @@ $(window).load(function() {
     changeServer(window.currentServerName);
   });
 
+  $('#serverurl').focus(function(event) {
+    if ($(this).val() == "") {
+      $(this).val("http://");
+    };
+  });
+
   console.log( "window loaded" );
 });
-
-
-// // sandbox disable popups
-// if (window.self !== window.top && window.name!="view1") {;
-//   window.alert = function(){/*disable alert*/};
-//   window.confirm = function(){/*disable confirm*/};
-//   window.prompt = function(){/*disable prompt*/};
-//   window.open = function(){/*disable open*/};
-// }
-// // prevent href=# click jump
-// document.addEventListener("DOMContentLoaded", function() {
-//   var links = document.getElementsByTagName("A");
-//   for(var i=0; i < links.length; i++) {
-//     if(links[i].href.indexOf('#')!=-1) {
-//       links[i].addEventListener("click", function(e) {
-//       console.debug("prevent href=# click");
-//           if (this.hash) {
-//             if (this.hash=="#") {
-//               e.preventDefault();
-//               return false;
-//             }
-//             else {
-//               /*
-//               var el = document.getElementById(this.hash.replace(/#/, ""));
-//               if (el) {
-//                 el.scrollIntoView(true);
-//               }
-//               */
-//             }
-//           }
-//           return false;
-//       })
-//     }
-//   }
-// }, false);

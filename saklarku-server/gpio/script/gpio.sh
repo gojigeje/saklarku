@@ -33,7 +33,8 @@ mode="$1"
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd "$DIR"
 scriptName=$(basename "$0")
-configFile="${scriptName%.*}.cfg"
+configFile="${scriptName%.*}_status.cfg"
+nameFile="${scriptName%.*}_name.cfg"
 scriptPath="$DIR/$scriptName"
 
 if [[ "$mode" == "toggle" || "$mode" == "single" ]]; then
@@ -69,6 +70,7 @@ usage() {
   echo "    ./$scriptName  alloff          set semua posisi GPIO dengan 0 / OFF"
   echo ""
   echo "    ./$scriptName  list            tampilkan daftar GPIO yang tersedia"
+  echo "    ./$scriptName  list-jadwal     tampilkan jadwal GPIO di crontab"
   echo "    ./$scriptName  status          tampilkan status masing-masing GPIO"
   echo ""
   echo "    ./$scriptName  startup         mengembalikan posisi GPIO saat startup"
@@ -87,8 +89,9 @@ saklar() {
     kondisi="OFF"
   fi
   echo "$2" > ${!target} #gojilog
+  nm="NAME$1"
   if [[ "$3" != "quiet" ]]; then
-    echo "{ \"success\": true, \"target\": \"$1\", \"status\": \"$2\", \"message\": \"Saklar $1 $kondisi\" }"
+    echo "{ \"success\": true, \"target\": \"$1\", \"status\": \"$2\", \"message\": \"${!nm} $kondisi\" }"
   fi
 }
 
@@ -177,7 +180,7 @@ list_jadwal() {
     ((k++))
   done < "$scriptName.tmp"
 
-  echo -n '{"success": true,"type": "jadwal",'
+  echo -n '{"success": true,"type": "list-jadwal",'
   echo -n '"harian": ['
   harian=$(cat "$scriptName.tmp.h" | sed 's/,$//g')
   echo -n "$harian"
@@ -193,6 +196,27 @@ list_jadwal() {
   rm "$scriptName.tmp" "$scriptName.tmp.h" "$scriptName.tmp.m" "$scriptName.tmp.b"
 }
 
+update_nama() {
+  > $nameFile
+  output="{ \"success\": true, \"type\": \"update-nama\", \"gpios\": ["; # awal json
+  num=1
+  for i in "${GPIOS[@]}"
+  do
+    nm=$(echo "$1" | cut -d ";" -f $num)
+    if [[ "$nm" == "" ]]; then
+      nm="GPIO-$num"
+      output="$output {\"gpio\": \"$num\", \"name\": \"$nm\"},"
+    else
+      output="$output {\"gpio\": \"$num\", \"name\": \"$nm\"},"
+    fi
+    echo "NAME$num=\"$nm\"" >> $nameFile
+    let num++;
+  done
+  output=$(echo "$output" | sed 's/,$//g')
+  output="$output ]}" # akhir json
+  echo "$output"
+}
+
 # ===========================================================================================================
 
 # cek file config
@@ -202,6 +226,27 @@ if [[ -f $configFile ]]; then
 else
   # buat, isi dengan status sekarang
   updatecfg  
+fi
+
+# hapus config lama
+if [[ -f "${scriptName%.*}.cfg" ]]; then
+  rm "${scriptName%.*}.cfg"
+fi
+
+# cek file nama
+if [[ -f $nameFile ]]; then
+  # load
+  . $nameFile
+else
+  # buat, isi dengan nama default
+  num=1
+  for i in "${GPIOS[@]}"
+  do
+    echo "NAME$num=\"GPIO $num\"" >> $nameFile
+    let num++;
+  done 
+  # lalu load
+  . $nameFile
 fi
 
 case "$mode" in
@@ -283,7 +328,9 @@ case "$mode" in
     num=1
     for i in "${GPIOS[@]}"
     do
-      output="$output {\"gpio\": \"$num\", \"path\": \"$i\"},"
+      nm="NAME$num"
+      id=$(($num - 1))
+      output="$output {\"gpio\": \"$num\", \"path\": \"$i\", \"name\": \"${!nm}\"},"
       let num++;
     done
     output=$(echo "$output" | sed 's/,$//g')
@@ -297,7 +344,9 @@ case "$mode" in
     for i in "${GPIOS[@]}"
     do
       st=$(cat $i)
-      output="$output {\"gpio\": \"$num\", \"path\": \"$i\", \"status\": \"$st\"},"
+      nm="NAME$num"
+      id=$(($num - 1))
+      output="$output {\"gpio\": \"$num\", \"path\": \"$i\", \"name\": \"${!nm}\", \"status\": \"$st\"},"
       let num++;
     done
     output=$(echo "$output" | sed 's/,$//g')
@@ -333,6 +382,10 @@ case "$mode" in
 
   "list-jadwal")
     list_jadwal
+  ;;
+
+  "update-nama")
+    update_nama "$2"
   ;;
 
   *)

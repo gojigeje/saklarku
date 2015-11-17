@@ -67,6 +67,12 @@
     echo "$output";
   }
 
+  elseif (isset($_GET['updatenama'])) {
+    $nama = $_POST['nama'];
+    $output = exec("bash $scriptlocation update-nama '$nama'");
+    echo "$output";
+  }
+
   else {
     echo '{ "success": false, "message": "request tidak lengkap atau salah" }'; 
   }

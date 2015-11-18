@@ -143,7 +143,7 @@ Saat ini client bisa mengenali jadwal harian, mingguan dan bulanan. Agar jadwal 
 
 Setiap kali dijalankan, script gpio.sh akan menyimpan status terakhir semua GPIO ke file `gpio_status.cfg` di direktori yang sama. Anda bisa membaca file config ini ketika router startup dan mengembalikan posisi GPIO sesuai dengan posisi terakhir sebelum router mati.
 
-* Masukkan command berikut di ` /etc/rc/local ` :  
+* Masukkan command berikut di ` /etc/rc.local ` :  
    `/full/path/to/gpio.sh startup `
 
 ## Menghubungkan Aplikasi Client ke Server

@@ -62,7 +62,7 @@ Pada dasarnya, script di server terdiri dari 2 bagian, yaitu:
   Script ini juga bisa dijalankan langsung dari *command line*, beri parameter ` help ` untuk menampilkan bantuan:
 
   ```
-  root@gojibox:# ./gpio.sh help
+  root@OpenWrt:# ./gpio.sh help
 
   Cara Pakai:
     ./gpio.sh  [mode] [target] [status]
@@ -105,21 +105,48 @@ Aplikasi client ini berbasis HTML dan JavaScript, dibangun menjadi aplikasi mobi
 
 Karena script server berbasis PHP dan BASH, maka Anda membutuhkan web server dan BASH shell untuk menjalankannya di router. 
 
-Install web server via ` opkg `. Saya pribadi menggunakan *lighttpd* sebagai web server di router saya, namun Anda bisa menggunakan web server lain seperti *nginx* atau *uhttpd*, yang penting web server tersebut bisa menjalankan script PHP.
+##### **Install Bash & PHP**
 
-Anda juga bisa menginstall BASH langsung dari ` opkg `.
+  ```
+  opkg update && opkg install bash php5 php5-cgi
+  ```
+
+##### **Atur Web Server Agar Bisa Mengeksekusi Script PHP**
+
+Untuk web server, kita bisa menggunakan web server apa saja, asalkan web server tersebut bisa mengeksekusi script php. Karena di OpenWrt sudah ada webserver bawaan (uHTTPd), kita akan menggunakannya sebagai contoh:
+
+Tambahkan baris *option* dan *list* berikut ke file `/etc/config/uhttpd` di bagian `config uhttpd 'main'`:
+
+```
+config uhttpd 'main'
+    ...
+    ...
+    option index_page "index.html, index.php"
+    list interpreter ".php=/usr/bin/php-cgi"
+```
+
+Lalu restart uhttpd:  
+   `/etc/init.d/uhttpd restart`
+
+##### **Copy File Server ke Router**
 
 (*Pastikan Anda sudah mengubah password di file __index.php__ dan menyesuaikan daftar GPIO di file __gpio.sh__*)
 
 1. Copy folder **gpio** ([saklarku-server/gpio](saklarku-server/gpio)) ke folder root web server, folder ini akan menjadi *endpoint* parameter URL di aplikasi client  
-   * misalnya root web server adalah `/website/`, copy folder `gpio` ke dalamnya, pastikan path file index.php dan file gpio.sh sesuai dengan path berikut:
-      * `/website/gpio/index.php`
-      * `/website/gpio/script/gpio.sh`
+   * misalnya root web server adalah `/www/`, copy folder `gpio` ke dalamnya, pastikan path file index.php dan file gpio.sh sesuai dengan path berikut:
+      * `/www/gpio/index.php`
+      * `/www/gpio/script/gpio.sh`
 
 2. Ubah permission file gpio.sh agar bisa dieksekusi  
-   `# chmod +x /website/gpio/script/gpio.sh`
+   `chmod +x /www/gpio/script/gpio.sh`
 
-3. Sekarang seharusnya script bisa diakses dengan alamat `http://IP_ROUTER/gpio/` dan akan menampilkan error: *unauthorized* karena memang harus diakses dari aplikasi client. Tidak apa-apa, script sudah bisa diakses.
+3. Coba jalankan script gpio dengan parameter *list*  
+   `bash /www/gpio/script/gpio.sh list`  
+   Jika sukses, seharusnya akan keluar output:  
+   `{ "success": true, "type": "list", "total": .......`  
+   berisi daftar gpio yang akan dikontrol script.  
+
+4. Sekarang coba buka browser, akses alamat `http://IP_ROUTER/gpio/` seharusnya akan menampilkan error: *unauthorized* karena memang harus diakses dari aplikasi client. Tidak apa-apa, sekarang script server sudah siap.
 
 ##### **Agar Jadwal di Crontab Bisa Ditampilkan di Aplikasi Client**
 
@@ -129,13 +156,13 @@ Saat ini client bisa mengenali jadwal harian, mingguan dan bulanan. Agar jadwal 
 *- perhatikan bahwa path script ditulis dengan lengkap, dan nama jadwal dipisahkan oleh simbol #*
 
 * Matikan saklar 1 tiap hari jam 6:15 pagi dengan nama "Lampu Mati"  
-   ` 15 6 * * *  /website/gpio/script/gpio.sh single 1 0  # Lampu Mati `
+   ` 15 6 * * *  /www/gpio/script/gpio.sh single 1 0  # Lampu Mati `
 
 * Nyalakan saklar 2 dan 3 tiap hari minggu jam 19:00 malam dengan nama "Pagar dan Taman ON"  
-   ` 0 19 * * 6  /website/gpio/script/gpio.sh group 23 11  # Pagar dan Taman ON`
+   ` 0 19 * * 6  /www/gpio/script/gpio.sh group 23 11  # Pagar dan Taman ON`
 
 * Matikan saklar 3 dan 4 tanggal 25 tiap bulan, jam 9:30 dengan nama "Tanggal Tua"  
-   ` 30 9 25 * * /website/gpio/script/gpio.sh group 34 00 # Tanggal Tua `
+   ` 30 9 25 * * /www/gpio/script/gpio.sh group 34 00 # Tanggal Tua `
 
 (_Anda bisa menggunakan layanan crontab generator agar lebih mudah dalam memahami sintaks crontab: http://crontab-generator.org_)
 

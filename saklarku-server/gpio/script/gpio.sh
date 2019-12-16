@@ -15,14 +15,14 @@
 #
 
 # sesuaikan urutan gpio
-GPIO1="/sys/devices/platform/leds-gpio.0/leds/HW553:blue:hspa/brightness"
-GPIO2="/sys/devices/platform/leds-gpio.0/leds/HW553:red:hspa/brightness"
-GPIO3="/sys/devices/platform/leds-gpio.0/leds/HW553:red:wifi/brightness"
-GPIO4="/sys/devices/platform/leds-gpio.0/leds/HW553:red:power/brightness"
-GPIO5="/sys/devices/platform/leds-gpio.0/leds/HW553:red:lan/brightness"
-GPIO6="/sys/devices/platform/leds-gpio.0/leds/HW553:blue:lan/brightness"
-GPIO7="/sys/devices/platform/leds-gpio.0/leds/HW553:blue:adsl/brightness"
-GPIO8="/sys/devices/platform/leds-gpio.0/leds/HW553:red:adsl/brightness"
+GPIO1="/sys/devices/gpio-leds/leds/HW553:blue:hspa/brightness"
+GPIO2="/sys/devices/gpio-leds/leds/HW553:red:hspa/brightness"
+GPIO3="/sys/devices/gpio-leds/leds/HW553:red:wifi/brightness"
+GPIO4="/sys/devices/gpio-leds/leds/HW553:red:power/brightness"
+GPIO5="/sys/devices/gpio-leds/leds/HW553:red:lan/brightness"
+GPIO6="/sys/devices/gpio-leds/leds/HW553:blue:lan/brightness"
+GPIO7="/sys/devices/gpio-leds/leds/HW553:blue:adsl/brightness"
+GPIO8="/sys/devices/gpio-leds/leds/HW553:red:adsl/brightness"
 
 GPIOS=( "$GPIO1" "$GPIO2" "$GPIO3" "$GPIO4" "$GPIO5" "$GPIO6" "$GPIO7" "$GPIO8" ) # jadikan array
 

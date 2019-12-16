@@ -1,6 +1,6 @@
 <?php 
   
-  $password="openwrtindonesia";        // password untuk login ke server saklarku
+  $password="yourpassword";        // password untuk login ke server saklarku
   $scriptlocation="script/gpio.sh";    // lokasi server, relatif ke file index.php ini
 
   header('Cache-Control: no-cache, must-revalidate');
@@ -72,9 +72,39 @@
     $output = exec("bash $scriptlocation update-nama '$nama'");
     echo "$output";
   }
+  elseif(isset($_GET['addjadwal'])){
+    $cron=$_POST['cron'];
+    $cron=str_replace('gpio','/www/gpio/'.$scriptlocation,$cron);
+    //read
+    $roots="/etc/crontabs/root";
+    copy($roots, $roots.'.bak');// backup first
+    $rootfiles=fopen($roots,'r');
+    $rootContent=fread($rootfiles,filesize($roots));
+    fclose($rootContent);
+    //write
+    $file = fopen($roots, "w");        
+    fwrite($file, $rootContent."\n".$cron);
+    fclose($file);
+    echo '{ "success": true, "message": "writes" }'; 
+  }
+  elseif(isset($_GET['deljadwal'])){//hapus jadwal
+    $cron=$_POST['param'];
+    $roots="/etc/crontabs/root";
+    copy($roots, $roots.'.bak');// backup first
+    remove_line($roots,$cron); //method delete
+    echo '{ "success": true, "message": "Deleted '.$cron.'" }'; 
+  }
 
   else {
     echo '{ "success": false, "message": "request tidak lengkap atau salah" }'; 
   }
-  
+
+  function remove_line($file, $remove) {
+    $lines = file($file, FILE_IGNORE_NEW_LINES);
+    foreach($lines as $key => $line) {
+        if(stripos($line,$remove)) unset($lines[$key]);
+    }
+    $data = implode(PHP_EOL, $lines);
+    file_put_contents($file, $data);
+}
 ?>

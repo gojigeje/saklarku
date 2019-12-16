@@ -210,6 +210,25 @@ function getList() {
   });
 }
 
+function jadwaldelete(a){
+  if(confirm('Sure want to delete this?')){
+    console.log('delete '+a);
+    $.ajax({
+      url: window.currentServerURL+'/?deljadwal',
+      type: 'POST',
+      data: {key: window.currentServerPassword,param:a},
+    })
+    .done(function(data){
+      if(data.success){
+        getJadwal();
+      }
+    })
+    .fail(function(){
+      getJadwal();
+    });
+
+  }
+}
 function getJadwal() {
   $.ajax({
     url: window.currentServerURL+'/?listjadwal',
@@ -229,7 +248,7 @@ function getJadwal() {
           __harian+='<div class="collapsible-header"><i class="fa fa-clock-o"></i>'+v.judul
           __harian+='<div class="secondary-content grey-text darken-2-text">'+v.ringkasan+'</div>'
           __harian+='</div>'
-          __harian+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'</div>'
+          __harian+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'<button onClick="jadwaldelete(\'# '+v.judul+'\')" style="right:0;position:absolute;">delete</button></div>'
           __harian+='</li>'
         });
         __harian+='  </ul>'
@@ -245,7 +264,7 @@ function getJadwal() {
           __mingguan+='<div class="collapsible-header"><i class="fa fa-clock-o"></i>'+v.judul
           __mingguan+='<div class="secondary-content grey-text darken-2-text">'+v.ringkasan+'</div>'
           __mingguan+='</div>'
-          __mingguan+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'</div>'
+          __mingguan+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'<button onClick="jadwaldelete(\'# '+v.judul+'\')" style="right:0;position:absolute;">delete</button></div>'
           __mingguan+='</li>'
         });
         __mingguan+='  </ul>'
@@ -261,7 +280,7 @@ function getJadwal() {
           __bulanan+='<div class="collapsible-header"><i class="fa fa-clock-o"></i>'+v.judul
           __bulanan+='<div class="secondary-content grey-text darken-2-text">'+v.ringkasan+'</div>'
           __bulanan+='</div>'
-          __bulanan+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'</div>'
+          __bulanan+='<div class="collapsible-body grey lighten-4"><i class="fa fa-terminal"></i>'+v.detail+'<button onClick="jadwaldelete(\'# '+v.judul+'\')" style="right:0;position:absolute;">delete</button></div>'
           __bulanan+='</li>'
         });
         __bulanan+='  </ul>'
@@ -564,6 +583,25 @@ $(window).load(function() {
 
     } else { console.log('lagi proses'); }
     
+  });
+  $('#btn_addjadwal').click(function() {
+    var jadwal = $('#jadwaladd').val();
+    $.ajax({
+      url: window.currentServerURL+'/?addjadwal',
+      type: 'POST',
+      data: {key: window.currentServerPassword,cron:jadwal},
+    })
+    .done(function(data){
+      if(data.success){
+        $('#modal-tambah-jadwal').closeModal();
+        getJadwal();
+      }
+    })
+    .fail(function(){
+      $('#modal-tambah-jadwal').closeModal();
+      getJadwal();
+    });
+
   });
 
   $('#btn_addserver').click(function() {

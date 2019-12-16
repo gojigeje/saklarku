@@ -125,6 +125,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="">
+                    <p><a href="#modal-tambah-jadwal" class="modal-trigger"><i class="fa fa-plus"></i>&nbsp; Tambah Jadwal</a></p>
+                </div>
             </div>
             <div id="setting" class="col s12">
                 <div id="setting-content">
@@ -242,6 +245,27 @@
                     <p><span id="message-content" class="confirm-content"></span></p>
                 </div>
                 <div class="modal-footer"> <a href="#!" class="modal-action modal-close waves-effect waves-indigo indigo darken-1 btn">OK</a> </div>
+            </div>
+            <div id="modal-tambah-jadwal" class="modal">
+                <div class="modal-content">              
+                    <div class="center-align">
+                        <h4>Tambah Jadwal</h4>
+                        <div class="divider"></div>
+                        <form class="col s12">
+                          <div class="row center-align">
+                            <div class="">
+                              <label for="script">Script cronjob<span id="script-error"></span></label>
+                              <input id="jadwaladd" type="text" placeholder="* * * * * gpio command params # keterangan" >
+                            </div>
+                            
+                          </div>
+                        </form>
+                        <p>
+                            <a href="#" class="btn btn-flat grey lighten-2 modal-close">Batal</a> &nbsp;
+                            <a id="btn_addjadwal" href="#" class="waves-effect white-text indigo darken-1 btn btn-flat modal-action">Tambah</a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
